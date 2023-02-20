@@ -78,3 +78,8 @@ predict模块只是浅测一下模型的精度和效果，如果需要应用可�
  |**device** |训练使用的环境，当cuda可用时自动设为cuda，否则自动设为cpu
 **batch_size**|批量大小
 |**model_choice**|模型的选择，可选U-net、deeplabv3+
+
+# 权值文件与数据
+百度网盘
+链接：https://pan.baidu.com/s/1ESyD9IOGYli5eFuH5t9BhA?pwd=gh97 
+提取码：gh97
