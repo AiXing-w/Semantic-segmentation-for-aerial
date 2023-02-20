@@ -6,6 +6,7 @@ from torchvision import io
 from utils.dataLoader import load_data_voc
 from utils.dataConvert import loadColorMap
 from utils.model import U_net, deeplabv3
+from torchvision import transforms
 import matplotlib.pyplot as plt
 
 
@@ -16,8 +17,10 @@ def label2image(pred, device):
     return colormap[X, :]
 
 
-def predict(net, device, img, test_iter):
-    X = test_iter.dataset.normalize_image(img).unsqueeze(0)
+def predict(net, device, img, means, stds):
+    trans = torchvision.transforms.Normalize(
+        mean=means, std=stds)
+    X = trans(img / 255).unsqueeze(0)
     pred = net(X.to(device)).argmax(dim=1)
     return pred.reshape(pred.shape[1], pred.shape[2])
 
@@ -64,6 +67,8 @@ def plotPredictAns(imgs):
 if __name__ == '__main__':
     voc_dir = './dataset/'
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    means = [0.4813, 0.4844, 0.4919]
+    stds = [0.2467, 0.2478, 0.2542]
     test_images, test_labels = read_voc_images(voc_dir, False)
     n = 4
     imgs = []
@@ -86,7 +91,7 @@ if __name__ == '__main__':
     for i in range(n):
         crop_rect = (0, 0, 600, 600)
         X = torchvision.transforms.functional.crop(test_images[i], *crop_rect)
-        pred = label2image(predict(net, device, X, test_iter), device)
+        pred = label2image(predict(net, device, X, means, stds), device)
         imgs += [X.permute(1, 2, 0), pred.cpu(),
                  torchvision.transforms.functional.crop(test_labels[i], *crop_rect).permute(1, 2, 0)]
 
